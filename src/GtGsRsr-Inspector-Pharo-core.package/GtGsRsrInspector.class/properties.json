@@ -1,0 +1,14 @@
+{
+	"category" : "GtGsRsr-Inspector-Pharo-Core",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "GtGsRsrInspector",
+	"pools" : [
+		 ],
+	"super" : "GTInspector",
+	"type" : "normal" }

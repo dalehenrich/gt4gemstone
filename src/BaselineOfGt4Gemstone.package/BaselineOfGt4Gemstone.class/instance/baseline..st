@@ -31,7 +31,10 @@ baseline: spec
                 className: 'ConfigurationOfBeacon';
                 versionString: #'development';
                 repository: 'http://www.smalltalkhub.com/mc/Pharo/Beacon/main' ].
-
+		spec 
+			package: 'GtGsRsr-Inspector-Pharo-Core' with: [ spec requires: #('GtGs-Inspector-Core') ];
+			package: 'GtGsRsr-Playground-Pharo-Core'  with: [ spec requires: #('GtGsRsr-Inspector-Pharo-Core') ];
+			yourself.
 		spec
 			package: 'GtGs-Gemstone-Stubs';
 			package: 'GtGs-Gemstone-Stubs-Basic';
@@ -62,11 +65,13 @@ baseline: spec
 		spec
 			group: 'Core'
 				with: #('GtGs-Gemstone-Stubs' 'GtGs-Gemstone-Stubs-Basic' 'GtGs-ClientGemstone-Core' 'GtGs-ClientPharo-Core' 'GtGs-ClientGemstone-Topez'  'GtGs-Inspector-Core'  'GtGs-Debugger-Core' 'GtGs-Editor-Core' 'GtGs-Inspector-Extensions' 'GtGs-Spotter-Gemstone-Core' 'GtGs-Inspector-Pharo-Core' 'GtGs-Playground-Pharo-Core' 'GtGs-Debugger-Pharo-Core' 'GtGs-Editor-Pharo-Core' 'GtGs-Spotter-Pharo-Core' 'GtGs-BareProxy-Pharo' 'GtGs-Pharo-Tools');
+			group: 'CoreRsr'
+				with: #('GtGsRsr-Editor-Pharo-Core' );
 			group: 'Tests'
 				with: #('GtGs-Common-Resources-Tests' 'GtGs-Inspector-Pharo-Tests' 'GtGs-Debugger-Pharo-Tests');
 			group: 'Examples'
 				with: #('GtGs-Examples-AddressBook-Model' 'GtGs-Examples-AddressBook-Extensions-Pharo');
-			group: 'default' with: #('Core' 'Tests' 'Examples') ].
+			group: 'default' with: #('Core' 'CoreRsr' 'Tests' 'Examples') ].
 		
 	 spec for: #'pharo5.x' do: [
 		spec 

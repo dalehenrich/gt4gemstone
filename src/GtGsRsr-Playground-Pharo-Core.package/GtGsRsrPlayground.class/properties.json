@@ -1,0 +1,14 @@
+{
+	"category" : "GtGsRsr-Playground-Pharo-Core",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "GtGsRsrPlayground",
+	"pools" : [
+		 ],
+	"super" : "GTPlayground",
+	"type" : "normal" }
