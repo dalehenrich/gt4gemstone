@@ -101,8 +101,9 @@ doit
 			projectFromUrl: 'file:', gt4gemstone, '/rowan/specs/gt4gemstone.ston')
 				projectsHome: rowanProjectsHome;
 			load.
-false ifTrue: [
-"skip load of gtoolkitRemote until https://github.com/feenkcom/gtoolkit-remote/issues/2 is addressed"
+true ifTrue: [
+"hacky workaround for https://github.com/feenkcom/gtoolkit-remote/issues/1 and 
+	https://github.com/feenkcom/gtoolkit-remote/issues/2"
 		gtoolkitRemote 
 			ifNotNil: [
 				self stdout nextPutAll: 'gtoolkitRemote loaded from ', gtoolkitRemote asString; lf.
