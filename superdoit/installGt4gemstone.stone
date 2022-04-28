@@ -1,8 +1,7 @@
 #!/usr/bin/env superdoit_stone
 options
 {
-	SuperDoitOptionalOptionWithRequiredArg long: 'gtoolkitGemstone' default: '$ROWAN_PROJECTS_HOME/gtoolkit-gemstone'.
-	SuperDoitOptionalOptionWithRequiredArg long: 'gtoolkitRemote' default: '$ROWAN_PROJECTS_HOME/gtoolkit-remote'.
+	SuperDoitOptionalOptionWithRequiredArg long: 'gt4gemstone' default: '$ROWAN_PROJECTS_HOME/gt4gemstone'.
 	SuperDoitOptionalOptionWithRequiredArg long: 'projectsHome'.
 }
 %
@@ -45,8 +44,7 @@ EXAMPLES
 %
 instvars
 rowanProjectsHome
-gtoolkitGemstone
-gtoolkitRemote
+gt4gemstone
 %
 doit
 	| warnings |
@@ -61,17 +59,12 @@ doit
 				ifNotNil: [:val | 
 					rowanProjectsHome := val asFileReference pathString ] ].
 	self stdout nextPutAll: 'ROWAN_PROJECTS_HOME = ', rowanProjectsHome asString; lf.
-	gtoolkitGemstone := self gtoolkitGemstone asFileReference pathString.
-	self stdout nextPutAll: 'gtoolkitGemstone = ', gtoolkitGemstone asString; lf.
-	gtoolkitRemote := self gtoolkitRemote asFileReference pathString.
-	self stdout nextPutAll: 'gtoolkitRemote = ', gtoolkitRemote asString; lf.
+	gt4gemstone := self gt4gemstone asFileReference pathString.
+	self stdout nextPutAll: 'gt4gemstone = ', gt4gemstone asString; lf.
+	warnings := String new.
 	[
 		(Rowan 
-			projectFromUrl: 'file:', gtoolkitGemstone, '/rowan/specs/gt4gemstone.ston')
-			projectsHome: rowanProjectsHome;
-			load.
-		(Rowan 
-			projectFromUrl: 'file:', gtoolkitRemote, '/rowan/specs/gtoolkit-remote.ston')
+			projectFromUrl: 'file:', gt4gemstone, '/rowan/specs/gt4gemstone.ston')
 			projectsHome: rowanProjectsHome;
 			load.
 	] on: CompileWarning do: [:ex |
