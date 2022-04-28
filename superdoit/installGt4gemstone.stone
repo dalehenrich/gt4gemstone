@@ -1,0 +1,91 @@
+#!/usr/bin/env superdoit_stone
+options
+{
+	SuperDoitOptionalOptionWithRequiredArg long: 'gtoolkitGemstone' default: '$ROWAN_PROJECTS_HOME/gtoolkit-gemstone'.
+	SuperDoitOptionalOptionWithRequiredArg long: 'gtoolkitRemote' default: '$ROWAN_PROJECTS_HOME/gtoolkit-remote'.
+	SuperDoitOptionalOptionWithRequiredArg long: 'projectsHome'.
+}
+%
+# Example options section
+#
+#options
+#{
+#	SuperDoitOptionalOptionWithNoArg long: 'noarg'.
+#	SuperDoitOptionalOptionWithNoArg long: 'noarg' short: 'n'.
+#
+#	SuperDoitOptionalOptionWithRequiredArg long: 'optional'.
+#	SuperDoitOptionalOptionWithRequiredArg long: 'optional' default: 'default'.
+#	SuperDoitOptionalOptionWithRequiredArg long: 'optional' short: 'o'.
+#	SuperDoitOptionalOptionWithRequiredArg long: 'optional' short: 'o' default: 'default'.
+#
+#	SuperDoitRequiredOptionWithRequiredArg long: 'required'.
+#	SuperDoitRequiredOptionWithRequiredArg long: 'required' short: 'r'.
+#}
+#%
+#
+usage
+-----
+USAGE 
+  $basename [--help | -h] [--debug | -D] 
+
+DESCRIPTION
+  Install gt4gemstone from Tonel files into a Rowan-enabled stone. Exits with 0
+  if success, 1 if failed,
+
+OPTIONS
+  -h, --help                 display usage message
+  -D, --debug                bring up topaz debugger in the event of a script error
+  --gtoolkitGemstone=<path-to-gtoolkit-gemstone>
+  --gtoolkitRemote=<path-to-gtoolkit-remote>
+
+EXAMPLES
+  $basename --help
+  $basename -D <script-arguments>
+-----
+%
+instvars
+rowanProjectsHome
+gtoolkitGemstone
+gtoolkitRemote
+%
+doit
+	| warnings |
+	self projectsHome
+		ifNotNil: [:val | 
+			"--projectsHome set"
+			rowanProjectsHome := val asFileReference pathString.
+			System gemEnvironmentVariable: 'ROWAN_PROJECTS_HOME' put: rowanProjectsHome ]
+		ifNil: [
+			(System gemEnvironmentVariable: 'ROWAN_PROJECTS_HOME')
+				ifNil: [ self error: 'ROWAN_PROJECTS_HOME must be defined via env var or by using --projectsHome' ]
+				ifNotNil: [:val | 
+					rowanProjectsHome := val asFileReference pathString ] ].
+	self stdout nextPutAll: 'ROWAN_PROJECTS_HOME = ', rowanProjectsHome asString; lf.
+	gtoolkitGemstone := self gtoolkitGemstone asFileReference pathString.
+	self stdout nextPutAll: 'gtoolkitGemstone = ', gtoolkitGemstone asString; lf.
+	gtoolkitRemote := self gtoolkitRemote asFileReference pathString.
+	self stdout nextPutAll: 'gtoolkitRemote = ', gtoolkitRemote asString; lf.
+	[
+		(Rowan 
+			projectFromUrl: 'file:', gtoolkitGemstone, '/rowan/specs/gt4gemstone.ston')
+			projectsHome: rowanProjectsHome;
+			load.
+		(Rowan 
+			projectFromUrl: 'file:', gtoolkitRemote, '/rowan/specs/gtoolkit-remote.ston')
+			projectsHome: rowanProjectsHome;
+			load.
+	] on: CompileWarning do: [:ex |
+		(ex description includesString: 'not optimized')
+			ifFalse: [ 
+				warnings 
+					addAll: ex asString;
+					lf ].
+		ex resume ].
+	warnings isEmpty
+		ifFalse: [ 
+			self stdout nextPutAll: warnings.
+			self 
+				exit: 'Unexpected CompileWarnings during load' 
+				withStatus: 1 ].
+	System commit
+%
