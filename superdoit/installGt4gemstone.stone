@@ -2,6 +2,7 @@
 options
 {
 	SuperDoitOptionalOptionWithRequiredArg long: 'gt4gemstone' default: '$ROWAN_PROJECTS_HOME/gt4gemstone'.
+	SuperDoitOptionalOptionWithRequiredArg long: 'gtoolkitRemote'.
 	SuperDoitOptionalOptionWithRequiredArg long: 'projectsHome'.
 }
 %
@@ -29,13 +30,21 @@ USAGE
 
 DESCRIPTION
   Install gt4gemstone from Tonel files into a Rowan-enabled stone. Exits with 0
-  if success, 1 if failed,
+  if success, 1 if failed.
+
+  It is expected that gt4gemstone has already been cloned (in order to get access 
+  to this script), but the other required projects will be cloned if they are not
+  already present in projectsHome
 
 OPTIONS
-  -h, --help                 display usage message
-  -D, --debug                bring up topaz debugger in the event of a script error
-  --gtoolkitGemstone=<path-to-gtoolkit-gemstone>
+-h, --help        display usage message
+-D, --debug       bring up topaz debugger in the event of a script error
+--gt4gemstone=<path-to-gt4gemstone>
+									Defaults to $ROWAN_PROJECTS_HOME/gt4gemstone.
   --gtoolkitRemote=<path-to-gtoolkit-remote>
+                  Defaults to <projectsHome>/gtoolkitRemote
+  --projectsHome=<path-to-git-clones>
+                    Defaults to $ROWAN_PROJECTS_HOME.
 
 EXAMPLES
   $basename --help
@@ -45,6 +54,29 @@ EXAMPLES
 instvars
 rowanProjectsHome
 gt4gemstone
+gtoolkitRemote
+%
+specs
+[
+RwLoadSpecificationV2 {
+	#specName : 'gtoolkit-remote',
+	#projectName : 'gtoolkit-remote',
+	#gitUrl : 'git@github.com:feenkcom/gtoolkit-remote.git',
+	#revision : 'master',
+	#projectSpecFile : 'rowan/project.ston',
+	#componentNames : [
+		'Core'
+	],
+	#platformProperties : {
+		'gemstone' : {
+			'SystemUser' : {
+				#defaultSymbolDictName : 'Globals'
+			}
+		}
+	},
+	#comment : ''
+}
+]
 %
 doit
 	| warnings |
@@ -60,13 +92,29 @@ doit
 					rowanProjectsHome := val asFileReference pathString ] ].
 	self stdout nextPutAll: 'ROWAN_PROJECTS_HOME = ', rowanProjectsHome asString; lf.
 	gt4gemstone := self gt4gemstone asFileReference pathString.
-	self stdout nextPutAll: 'gt4gemstone = ', gt4gemstone asString; lf.
+	self stdout nextPutAll: 'gt4gemstone loaded from ', gt4gemstone asString; lf.
+  self gtoolkitRemote
+		ifNotNil: [:val | gtoolkitRemote := val  asFileReference pathString ].
 	warnings := String new.
 	[
 		(Rowan 
 			projectFromUrl: 'file:', gt4gemstone, '/rowan/specs/gt4gemstone.ston')
-			projectsHome: rowanProjectsHome;
+				projectsHome: rowanProjectsHome;
 			load.
+false ifTrue: [
+"skip load of gtoolkitRemote until https://github.com/feenkcom/gtoolkit-remote/issues/2 is addressed"
+		gtoolkitRemote 
+			ifNotNil: [
+				self stdout nextPutAll: 'gtoolkitRemote loaded from ', gtoolkitRemote asString; lf.
+				(Rowan 
+					projectFromUrl: 'file:', gtoolkitRemote, '/rowan/specs/gtoolkitRemote.ston')
+						projectsHome: rowanProjectsHome;
+					load  ]
+			ifNil: [
+				self preDoitSpecLoad: [:spec | 
+					self stdout nextPutAll: 'gtoolkitRemote loaded from ', rowanProjectsHome, '/', spec projectName ; lf.
+					spec projectsHome: rowanProjectsHome ] ]
+].
 	] on: CompileWarning do: [:ex |
 		(ex description includesString: 'not optimized')
 			ifFalse: [ 
